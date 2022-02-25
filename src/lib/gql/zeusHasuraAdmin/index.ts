@@ -164,6 +164,16 @@ export type ValueTypes = {
     id?: boolean;
     __typename?: boolean;
   }>;
+  ['VouchInput']: {
+    circle_id: number;
+    nominee_id: number;
+  };
+  ['VouchOutput']: AliasType<{
+    id?: boolean;
+    /** An object relationship */
+    nominee?: ValueTypes['nominees'];
+    __typename?: boolean;
+  }>;
   ['bigint']: number;
   /** Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'. */
   ['bigint_comparison_exp']: {
@@ -4188,6 +4198,7 @@ export type ValueTypes = {
       { payload: ValueTypes['UploadImageInput'] },
       ValueTypes['UpdateProfileResponse']
     ];
+    vouch?: [{ payload: ValueTypes['VouchInput'] }, ValueTypes['VouchOutput']];
     __typename?: boolean;
   }>;
   /** columns and relationships of "nominees" */
@@ -8916,6 +8927,12 @@ export type ModelTypes = {
     UserResponse: ModelTypes['users'];
     id: string;
   };
+  ['VouchInput']: GraphQLTypes['VouchInput'];
+  ['VouchOutput']: {
+    id: number;
+    /** An object relationship */
+    nominee: ModelTypes['nominees'];
+  };
   ['bigint']: number;
   /** Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'. */
   ['bigint_comparison_exp']: GraphQLTypes['bigint_comparison_exp'];
@@ -10702,6 +10719,7 @@ export type ModelTypes = {
     uploadCircleLogo?: ModelTypes['UpdateCircleResponse'];
     uploadProfileAvatar?: ModelTypes['UpdateProfileResponse'];
     uploadProfileBackground?: ModelTypes['UpdateProfileResponse'];
+    vouch?: ModelTypes['VouchOutput'];
   };
   /** columns and relationships of "nominees" */
   ['nominees']: {
@@ -12938,6 +12956,16 @@ export type GraphQLTypes = {
     /** An object relationship */
     UserResponse: GraphQLTypes['users'];
     id: string;
+  };
+  ['VouchInput']: {
+    circle_id: number;
+    nominee_id: number;
+  };
+  ['VouchOutput']: {
+    __typename: 'VouchOutput';
+    id: number;
+    /** An object relationship */
+    nominee: GraphQLTypes['nominees'];
   };
   ['bigint']: number;
   /** Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'. */
@@ -15884,6 +15912,7 @@ export type GraphQLTypes = {
     uploadCircleLogo?: GraphQLTypes['UpdateCircleResponse'];
     uploadProfileAvatar?: GraphQLTypes['UpdateProfileResponse'];
     uploadProfileBackground?: GraphQLTypes['UpdateProfileResponse'];
+    vouch?: GraphQLTypes['VouchOutput'];
   };
   /** columns and relationships of "nominees" */
   ['nominees']: {
@@ -19914,6 +19943,7 @@ export const enum vaults_update_column {
 /** unique or primary key constraints on table "vouches" */
 export const enum vouches_constraint {
   vouches_pkey = 'vouches_pkey',
+  vouches_unique = 'vouches_unique',
 }
 /** select columns of table "vouches" */
 export const enum vouches_select_column {

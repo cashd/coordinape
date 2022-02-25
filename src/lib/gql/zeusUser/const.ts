@@ -449,6 +449,20 @@ export const AllTypesProps: Record<string, any> = {
       required: true,
     },
   },
+  VouchInput: {
+    circle_id: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+    nominee_id: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+  },
   bigint: 'String',
   bigint_comparison_exp: {
     _eq: {
@@ -3940,6 +3954,14 @@ export const AllTypesProps: Record<string, any> = {
     uploadProfileBackground: {
       payload: {
         type: 'UploadImageInput',
+        array: false,
+        arrayRequired: false,
+        required: true,
+      },
+    },
+    vouch: {
+      payload: {
+        type: 'VouchInput',
         array: false,
         arrayRequired: false,
         required: true,
@@ -9163,6 +9185,10 @@ export const ReturnTypes: Record<string, any> = {
     UserResponse: 'users',
     id: 'ID',
   },
+  VouchOutput: {
+    id: 'Int',
+    nominee: 'nominees',
+  },
   burns: {
     circle: 'circles',
     circle_id: 'bigint',
@@ -9271,6 +9297,7 @@ export const ReturnTypes: Record<string, any> = {
     uploadCircleLogo: 'UpdateCircleResponse',
     uploadProfileAvatar: 'UpdateProfileResponse',
     uploadProfileBackground: 'UpdateProfileResponse',
+    vouch: 'VouchOutput',
   },
   nominees: {
     address: 'String',

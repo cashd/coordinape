@@ -99,12 +99,43 @@ export function getGql(url: string, getToken: () => string) {
       }
     );
 
+  const getUserFromProfileIdWithCircle = async (
+    profileId: number,
+    circleId: number
+  ) => {
+    const { profiles_by_pk } = await makeQuery(url, getToken)('query')({
+      profiles_by_pk: [
+        {
+          id: profileId,
+        },
+        {
+          users: [
+            {
+              where: {
+                circle_id: { _eq: circleId },
+              },
+            },
+            {
+              circle: {
+                nomination_days_limit: true,
+                min_vouches: true,
+              },
+              id: true,
+            },
+          ],
+        },
+      ],
+    });
+    return profiles_by_pk;
+  };
+
   return {
     updateProfile,
     getCurrentEpoch,
     updateProfileAvatar,
     updateProfileBackground,
     updateCircleLogo,
+    getUserFromProfileIdWithCircle,
   };
 }
 
