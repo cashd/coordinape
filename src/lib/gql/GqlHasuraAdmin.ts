@@ -378,6 +378,9 @@ export class Gql {
           vouches_required: true,
           nominated_by_user_id: true,
           nominations_aggregate: [{}, { aggregate: { count: [{}, true] } }],
+          circle: {
+            only_giver_vouch: true,
+          },
         },
       ],
     });
@@ -580,6 +583,17 @@ export class Gql {
         },
         {
           id: true,
+          nominee: {
+            id: true,
+            address: true,
+            name: true,
+            circle_id: true,
+            user_id: true,
+            ended: true,
+            vouches_required: true,
+            nominated_by_user_id: true,
+            nominations_aggregate: [{}, { aggregate: { count: [{}, true] } }],
+          },
         },
       ],
     });

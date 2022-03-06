@@ -83,7 +83,6 @@ input CreateNomineeInput {
 
 input VouchInput {
   nominee_id: Int!
-  circle_id: Int!
 }
 
 type CreateCircleResponse {

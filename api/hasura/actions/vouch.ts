@@ -28,13 +28,13 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     ).parse(req.body);
 
     const { hasuraProfileId: voucherProfileId } = sessionVariables;
-    const { nominee_id: nomineeId, circle_id: circleId } = input;
+    const { nominee_id: nomineeId } = input;
 
     // validate that this is allowed
-    const { voucher } = await validate(circleId, nomineeId, voucherProfileId);
+    const { voucher } = await validate(nomineeId, voucherProfileId);
 
     // vouch and build user if needed
-    const updatedNominee = await vouch(nomineeId, voucher, circleId);
+    const updatedNominee = await vouch(nomineeId, voucher);
 
     return res.status(200).json({ id: updatedNominee.id });
   } catch (e: any) {
@@ -42,30 +42,28 @@ export default async function (req: VercelRequest, res: VercelResponse) {
   }
 }
 
-async function validate(
-  circleId: number,
-  nomineeId: number,
-  voucherProfileId: number
-) {
+async function validate(nomineeId: number, voucherProfileId: number) {
+  // Get the nominee
+  const nominee = await getNominee(nomineeId);
+
   // make sure circle exists
-  const { circles_by_pk: circle } = await gql.getCircle(circleId);
-  if (!circle) {
+  if (!nominee.circle) {
     throw new NotFoundError('circle not found');
   }
 
   // Check if voucher exists in the same circle as the nominee
   // TODO: this uses assert for error handling
-  const voucher = await getUserFromProfileId(voucherProfileId, circleId);
+  const voucher = await getUserFromProfileId(
+    voucherProfileId,
+    nominee.circle_id
+  );
 
   // If circle only allows giver to vouch, make sure voucher is a giver
-  if (circle.only_giver_vouch && voucher.non_giver) {
+  if (nominee.circle.only_giver_vouch && voucher.non_giver) {
     throw new ForbiddenError(
       "voucher is a 'non-giver' so is not allowed to vouch"
     );
   }
-
-  // Get the nominee
-  const nominee = await getNominee(nomineeId);
 
   // make sure the nomination period hasn't ended
   if (nominee.ended) {
@@ -91,19 +89,21 @@ async function validate(
   };
 }
 
-async function vouch(nomineeId: number, voucher: voucher, circleId: number) {
+async function vouch(nomineeId: number, voucher: voucher) {
   // vouch for the nominee
-  if (!(await gql.insertVouch(nomineeId, voucher.id))) {
+
+  // this inserts the vouch and also fetches the nominee with updated vouch count
+  const insert_vouches = await gql.insertVouch(nomineeId, voucher.id);
+  if (!insert_vouches?.nominee) {
     throw new InternalServerError('unable to add vouch');
   }
 
-  // refetch the nominee now to update the nomination/vouch count
-  const nominee = await getNominee(nomineeId);
+  const nominee = insert_vouches.nominee;
 
   // announce the vouching
   await sendSocialMessage({
     message: `${nominee.name} has been vouched for by ${voucher.name}!`,
-    circleId: circleId,
+    circleId: nominee.circle_id,
     sanitize: true,
     channels: {
       // TODO: figure out if these need to be conditionalized?
@@ -115,20 +115,20 @@ async function vouch(nomineeId: number, voucher: voucher, circleId: number) {
   // if there are enough nominations, go ahead and add the user to the circle
   const nomCount = nominee.nominations_aggregate.aggregate?.count || 0;
   if (nominee.vouches_required - 1 <= nomCount) {
-    return await convertNomineeToUser(nominee, circleId);
+    return await convertNomineeToUser(nominee);
   }
 
   return nominee;
 }
 
-async function convertNomineeToUser(nominee: nominee, circleId: number) {
+async function convertNomineeToUser(nominee: nominee) {
   // Get the nominee into the user table
   let userId = nominee.user_id;
   if (!userId) {
     const addedUser = await gql.insertUser(
       nominee.address,
       nominee.name,
-      circleId
+      nominee.circle_id
     );
     if (!addedUser) {
       throw new InternalServerError('unable to add user');
@@ -158,7 +158,7 @@ async function convertNomineeToUser(nominee: nominee, circleId: number) {
   // announce that they are vouched in
   await sendSocialMessage({
     message: `${nominee.name} has received enough vouches and is now in the circle!`,
-    circleId: circleId,
+    circleId: nominee.circle_id,
     sanitize: true,
     channels: {
       // TODO: figure out if these need to be conditionalized?

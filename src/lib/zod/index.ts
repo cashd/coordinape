@@ -76,7 +76,6 @@ export const uploadCircleImageInput = z
 export const vouchInput = z
   .object({
     nominee_id: z.number(),
-    circle_id: z.number(),
   })
   .strict();
 
