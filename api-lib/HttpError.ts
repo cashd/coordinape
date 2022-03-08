@@ -25,12 +25,12 @@ export class BadRequestError extends Error {
   httpStatus = 400;
 }
 
-export function ErrorResponse(res: VercelResponse, error: any): VercelResponse {
+export function errorResponse(res: VercelResponse, error: any): VercelResponse {
   const statusCode = error.httpStatus || 500;
-  return ErrorResponseWithStatusCode(res, error, statusCode);
+  return errorResponseWithStatusCode(res, error, statusCode);
 }
 
-export function ErrorResponseWithStatusCode(
+export function errorResponseWithStatusCode(
   res: VercelResponse,
   error: any,
   statusCode: number

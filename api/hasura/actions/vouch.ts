@@ -4,12 +4,12 @@ import { getUserFromProfileId } from '../../../api-lib/findUser';
 import { gql } from '../../../api-lib/Gql';
 import {
   BadRequestError,
-  ErrorResponse,
+  errorResponse,
   ForbiddenError,
   InternalServerError,
   NotFoundError,
 } from '../../../api-lib/HttpError';
-import { sendSocialMessage } from '../../../api-lib/sendSocialMessage';
+import okResponse from '../../../api-lib/okResponse';
 import { Awaited } from '../../../api-lib/ts4.5shim';
 import {
   composeHasuraActionRequestBodyWithSession,
@@ -39,9 +39,9 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     // vouch and build user if needed
     const updatedNominee = await vouch(nomineeId, voucher);
 
-    return res.status(200).json({ id: updatedNominee.id });
+    return okResponse(res, { id: updatedNominee.id });
   } catch (e: any) {
-    return ErrorResponse(res, e);
+    return errorResponse(res, e);
   }
 }
 
@@ -101,19 +101,9 @@ async function vouch(nomineeId: number, voucher: Voucher) {
     throw new InternalServerError('unable to add vouch');
   }
 
-  const nominee = insert_vouches.nominee;
+  // the vouching is announced with an event trigger
 
-  // announce the vouching
-  await sendSocialMessage({
-    message: `${nominee.name} has been vouched for by ${voucher.name}!`,
-    circleId: nominee.circle_id,
-    sanitize: true,
-    channels: {
-      // TODO: figure out if these need to be conditionalized?
-      discord: true,
-      telegram: true,
-    },
-  });
+  const nominee = insert_vouches.nominee;
 
   // if there are enough nominations, go ahead and add the user to the circle
   const nomCount = nominee.nominations_aggregate.aggregate?.count || 0;
@@ -147,17 +137,8 @@ async function convertNomineeToUser(nominee: Nominee) {
     throw new InternalServerError('unable to update nominee userId');
   }
 
-  // announce that they are vouched in
-  await sendSocialMessage({
-    message: `${nominee.name} has received enough vouches and is now in the circle!`,
-    circleId: nominee.circle_id,
-    sanitize: true,
-    channels: {
-      // TODO: figure out if these need to be conditionalized?
-      discord: true,
-      telegram: true,
-    },
-  });
+  // the nomineeVouchedIn event handlers will run and announce the user being vouched in
+
   return updatedNominee;
 }
 

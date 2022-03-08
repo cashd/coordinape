@@ -147,3 +147,35 @@ event_triggers:
     num_retries: 5
     timeout_sec: 60
   webhook: "{{HASURA_API_BASE_URL}}/event_triggers/createVouchedUser"
+- definition:
+    enable_manual: false
+    update:
+      columns:
+      - ended
+      - name
+      - user_id
+  headers:
+  - name: verification_key
+    value_from_env: HASURA_EVENT_SECRET
+  name: nomineeVouchedInDiscord
+  retry_conf:
+    interval_sec: 3600
+    num_retries: 5
+    timeout_sec: 60
+  webhook: "{{HASURA_API_BASE_URL}}/event_triggers/nomineeVouchedInDiscord"
+- definition:
+    enable_manual: false
+    update:
+      columns:
+      - id
+      - name
+      - user_id
+  headers:
+  - name: verification_key
+    value_from_env: HASURA_EVENT_SECRET
+  name: nomineeVouchedInTelegram
+  retry_conf:
+    interval_sec: 3600
+    num_retries: 5
+    timeout_sec: 60
+  webhook: "{{HASURA_API_BASE_URL}}/event_triggers/nomineeVouchedInTelegram"
