@@ -17,6 +17,9 @@ import {
   vouchInput,
 } from '../../../src/lib/zod';
 
+type Voucher = Awaited<ReturnType<typeof getUserFromProfileId>>;
+type Nominee = Awaited<ReturnType<typeof getNominee>>;
+
 export default async function (req: VercelRequest, res: VercelResponse) {
   try {
     const {
@@ -89,7 +92,7 @@ async function validate(nomineeId: number, voucherProfileId: number) {
   };
 }
 
-async function vouch(nomineeId: number, voucher: voucher) {
+async function vouch(nomineeId: number, voucher: Voucher) {
   // vouch for the nominee
 
   // this inserts the vouch and also fetches the nominee with updated vouch count
@@ -121,7 +124,7 @@ async function vouch(nomineeId: number, voucher: voucher) {
   return nominee;
 }
 
-async function convertNomineeToUser(nominee: nominee) {
+async function convertNomineeToUser(nominee: Nominee) {
   // Get the nominee into the user table
   let userId = nominee.user_id;
   if (!userId) {
@@ -136,18 +139,7 @@ async function convertNomineeToUser(nominee: nominee) {
     userId = addedUser.id;
   }
 
-  // Make sure they have a profile too
-  const { profiles } = await gql.getProfileAndMembership(nominee.address);
-  if (profiles.length == 0) {
-    const addedProfiles = await gql.insertProfiles([
-      {
-        address: nominee.address,
-      },
-    ]);
-    if (!addedProfiles) {
-      throw new InternalServerError('unable to add profile for new user');
-    }
-  }
+  // The profile is automatically created by the createProfile event trigger, if needed
 
   // attach the user id to the nominee, and mark the nomination ended
   const updatedNominee = await gql.updateNomineeUser(nominee.id, userId);
@@ -176,6 +168,3 @@ async function getNominee(nomineeId: number) {
   }
   return nom.nominees_by_pk;
 }
-
-type voucher = Awaited<ReturnType<typeof getUserFromProfileId>>;
-type nominee = Awaited<ReturnType<typeof getNominee>>;
