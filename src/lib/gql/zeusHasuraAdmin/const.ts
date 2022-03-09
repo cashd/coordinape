@@ -287,6 +287,20 @@ export const AllTypesProps: Record<string, any> = {
       required: false,
     },
   },
+  DeleteEpochInput: {
+    circle_id: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+    id: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+  },
   Int_comparison_exp: {
     _eq: {
       type: 'Int',
@@ -6768,6 +6782,14 @@ export const AllTypesProps: Record<string, any> = {
     createUser: {
       payload: {
         type: 'CreateUserInput',
+        array: false,
+        arrayRequired: false,
+        required: true,
+      },
+    },
+    deleteEpoch: {
+      payload: {
+        type: 'DeleteEpochInput',
         array: false,
         arrayRequired: false,
         required: true,
@@ -18855,6 +18877,9 @@ export const ReturnTypes: Record<string, any> = {
     id: 'Int',
     nominee: 'nominees',
   },
+  DeleteEpochResponse: {
+    success: 'Boolean',
+  },
   LogoutResponse: {
     id: 'Int',
     profile: 'profiles',
@@ -19888,6 +19913,7 @@ export const ReturnTypes: Record<string, any> = {
     createCircle: 'CreateCircleResponse',
     createNominee: 'CreateNomineeResponse',
     createUser: 'UserResponse',
+    deleteEpoch: 'DeleteEpochResponse',
     delete_burns: 'burns_mutation_response',
     delete_burns_by_pk: 'burns',
     delete_circle_integrations: 'circle_integrations_mutation_response',

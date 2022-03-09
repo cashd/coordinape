@@ -75,8 +75,8 @@ export const uploadCircleImageInput = z
 
 export const deleteEpochInput = z
   .object({
-    id: z.number(),
-    circle_id: z.number(),
+    id: z.number().int().positive(),
+    circle_id: z.number().int().positive(),
   })
   .strict();
 
