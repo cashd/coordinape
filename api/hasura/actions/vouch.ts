@@ -9,7 +9,6 @@ import {
   InternalServerError,
   NotFoundError,
 } from '../../../api-lib/HttpError';
-import okResponse from '../../../api-lib/okResponse';
 import { Awaited } from '../../../api-lib/ts4.5shim';
 import {
   composeHasuraActionRequestBodyWithSession,
@@ -39,7 +38,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     // vouch and build user if needed
     const updatedNominee = await vouch(nomineeId, voucher);
 
-    return okResponse(res, { id: updatedNominee.id });
+    return res.status(200).json({ id: updatedNominee.id });
   } catch (e: any) {
     return errorResponse(res, e);
   }
