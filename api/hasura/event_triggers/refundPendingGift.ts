@@ -3,7 +3,7 @@ import assert from 'assert';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 import { gql } from '../../../api-lib/Gql';
-import { ErrorResponse } from '../../../api-lib/HttpError';
+import { errorResponse } from '../../../api-lib/HttpError';
 import { EventTriggerPayload } from '../../../api-lib/types';
 import { verifyHasuraRequestMiddleware } from '../../../api-lib/validate';
 import { ValueTypes } from '../../../src/lib/gql/zeusHasuraAdmin';
@@ -162,7 +162,7 @@ async function handler(req: VercelRequest, res: VercelResponse) {
       results.push(newNonReceiverResult);
     }
   } catch (e) {
-    ErrorResponse(res, e);
+    errorResponse(res, e);
   }
 
   res.status(200).json({
