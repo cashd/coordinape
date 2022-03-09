@@ -397,6 +397,9 @@ export class Gql {
         },
         {
           id: true,
+          voucher: {
+            name: true,
+          },
         },
       ],
     });
