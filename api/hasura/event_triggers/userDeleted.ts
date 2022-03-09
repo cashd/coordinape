@@ -1,9 +1,30 @@
-import { gql } from './Gql';
-import { NotFoundError } from './HttpError';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const userReset = async function (userId: number) {
+import { gql } from '../../../api-lib/Gql';
+import { NotFoundError } from '../../../api-lib/HttpError';
+import { EventTriggerPayload } from '../../../api-lib/types';
+import { verifyHasuraRequestMiddleware } from '../../../api-lib/validate';
+
+async function handler(req: VercelRequest, res: VercelResponse) {
+  // no parsing should be needed here since this data comes straight from
+  // the database and zeus keeps this consistent for us
+  const {
+    event: { data },
+  }: EventTriggerPayload<'users', 'UPDATE'> = req.body;
+
+  if (data.old.deleted_at || !data.new.deleted_at) {
+    // user wasn't just deleted, so nothing to do
+    return res
+      .status(200)
+      .json({ message: `user wasn't soft deleted, nothing to do` });
+  }
+
+  // this user has been deleted, so we need to cleanup:
+  // - sent and received pending gifts
+  // - teammate entries
+
   const { pending_sent_gifts, pending_received_gifts } = await getPendingGifts(
-    userId
+    data.old.id
   );
 
   for (const g of pending_sent_gifts) {
@@ -25,11 +46,13 @@ const userReset = async function (userId: number) {
     //   $sender->save();
   }
 
-  await gql.deleteTeammate(9);
-  //   $user->give_token_remaining = $user->starting_tokens;
-  //   $user->give_token_received = 0;
-  //   $user->save();
-};
+  await gql.deleteTeammate(data.old.id);
+
+  return res.status(200).json({
+    message: `refunds completed`,
+    // results,
+  });
+}
 
 const deleteGift = async function (giftId: number) {
   return await gql.q('mutation')({
@@ -69,9 +92,9 @@ const getPendingGifts = async function (senderId: number) {
     ],
   });
   if (!users_by_pk) {
-    throw new NotFoundError('unable to find gifts from user we are deleting');
+    throw new NotFoundError('unable to find gifts deleted user');
   }
   return users_by_pk;
 };
 
-export default userReset;
+export default verifyHasuraRequestMiddleware(handler);

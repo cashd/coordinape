@@ -622,4 +622,30 @@ export class Gql {
     });
     return update_nominees_by_pk;
   }
+
+  async deleteTeammate(userId: number) {
+    const { delete_teammates } = await this.q('mutation')({
+      delete_teammates: [
+        {
+          where: {
+            _or: [
+              {
+                team_mate_id: { _eq: userId },
+              },
+              {
+                user_id: { _eq: userId },
+              },
+            ],
+          },
+        },
+        {
+          affected_rows: true,
+        },
+      ],
+    });
+    if (!delete_teammates?.affected_rows) {
+      throw 'delete of teammate failed';
+    }
+    return;
+  }
 }

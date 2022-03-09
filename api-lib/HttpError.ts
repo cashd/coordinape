@@ -25,6 +25,10 @@ export class BadRequestError extends Error {
   httpStatus = 400;
 }
 
+export class UnauthorizedError extends Error {
+  httpStatus = 401;
+}
+
 export function errorResponse(res: VercelResponse, error: any): VercelResponse {
   const statusCode = error.httpStatus || 500;
   return errorResponseWithStatusCode(res, error, statusCode);
