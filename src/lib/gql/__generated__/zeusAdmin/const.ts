@@ -459,6 +459,38 @@ export const AllTypesProps: Record<string, any> = {
       required: false,
     },
   },
+  UpdateUserInput: {
+    bio: {
+      type: 'String',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    circle_id: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+    epoch_first_visit: {
+      type: 'Boolean',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    name: {
+      type: 'String',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    non_receiver: {
+      type: 'Boolean',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+  },
   UploadCircleImageInput: {
     circle_id: {
       type: 'Int',
@@ -4935,6 +4967,70 @@ export const AllTypesProps: Record<string, any> = {
         required: false,
       },
     },
+    epoch_pending_token_gifts: {
+      distinct_on: {
+        type: 'pending_token_gifts_select_column',
+        array: true,
+        arrayRequired: false,
+        required: true,
+      },
+      limit: {
+        type: 'Int',
+        array: false,
+        arrayRequired: false,
+        required: false,
+      },
+      offset: {
+        type: 'Int',
+        array: false,
+        arrayRequired: false,
+        required: false,
+      },
+      order_by: {
+        type: 'pending_token_gifts_order_by',
+        array: true,
+        arrayRequired: false,
+        required: true,
+      },
+      where: {
+        type: 'pending_token_gifts_bool_exp',
+        array: false,
+        arrayRequired: false,
+        required: false,
+      },
+    },
+    epoch_pending_token_gifts_aggregate: {
+      distinct_on: {
+        type: 'pending_token_gifts_select_column',
+        array: true,
+        arrayRequired: false,
+        required: true,
+      },
+      limit: {
+        type: 'Int',
+        array: false,
+        arrayRequired: false,
+        required: false,
+      },
+      offset: {
+        type: 'Int',
+        array: false,
+        arrayRequired: false,
+        required: false,
+      },
+      order_by: {
+        type: 'pending_token_gifts_order_by',
+        array: true,
+        arrayRequired: false,
+        required: true,
+      },
+      where: {
+        type: 'pending_token_gifts_bool_exp',
+        array: false,
+        arrayRequired: false,
+        required: false,
+      },
+    },
   },
   epochs_aggregate_fields: {
     count: {
@@ -5145,6 +5241,12 @@ export const AllTypesProps: Record<string, any> = {
       arrayRequired: false,
       required: false,
     },
+    epoch_pending_token_gifts: {
+      type: 'pending_token_gifts_bool_exp',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
     grant: {
       type: 'numeric_comparison_exp',
       array: false,
@@ -5302,6 +5404,12 @@ export const AllTypesProps: Record<string, any> = {
     },
     ended: {
       type: 'Boolean',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    epoch_pending_token_gifts: {
+      type: 'pending_token_gifts_arr_rel_insert_input',
       array: false,
       arrayRequired: false,
       required: false,
@@ -5630,6 +5738,12 @@ export const AllTypesProps: Record<string, any> = {
     },
     ended: {
       type: 'order_by',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    epoch_pending_token_gifts_aggregate: {
+      type: 'pending_token_gifts_aggregate_order_by',
       array: false,
       arrayRequired: false,
       required: false,
@@ -7679,6 +7793,14 @@ export const AllTypesProps: Record<string, any> = {
         array: false,
         arrayRequired: false,
         required: false,
+      },
+    },
+    updateUser: {
+      payload: {
+        type: 'UpdateUserInput',
+        array: false,
+        arrayRequired: false,
+        required: true,
       },
     },
     update_burns: {
@@ -19556,6 +19678,8 @@ export const ReturnTypes: Record<string, any> = {
     days: 'Int',
     end_date: 'timestamptz',
     ended: 'Boolean',
+    epoch_pending_token_gifts: 'pending_token_gifts',
+    epoch_pending_token_gifts_aggregate: 'pending_token_gifts_aggregate',
     grant: 'numeric',
     id: 'bigint',
     notified_before_end: 'timestamp',
@@ -19974,6 +20098,7 @@ export const ReturnTypes: Record<string, any> = {
     insert_vouches: 'vouches_mutation_response',
     insert_vouches_one: 'vouches',
     logoutUser: 'LogoutResponse',
+    updateUser: 'UserResponse',
     update_burns: 'burns_mutation_response',
     update_burns_by_pk: 'burns',
     update_circle_integrations: 'circle_integrations_mutation_response',
